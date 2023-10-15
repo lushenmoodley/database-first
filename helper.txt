@@ -1,0 +1,68 @@
+Type the following command on package manager console
+
+install 
+
+Microsoft.EntityFrameworkCore.Design
+Microsoft.EntityFrameworkCore.SqlServer
+Microsoft.EntityFrameworkCore.Tools
+
+Command 1
+Scaffold-DbContext -provider Microsoft.EntityFrameworkCore.SqlServer -connection "Data Source=LUSHEN_LAPTOP\SQLEXPRESS;initial catalog=Demo;TrustServerCertificate=True;trusted_connection=yes;" -OutputDir "Models" 
+
+Step 2 add the following to appsettings.json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=LUSHEN_LAPTOP\\SQLEXPRESS;initial catalog=Demo;TrustServerCertificate=True;trusted_connection=yes;"
+  }
+}
+
+
+Step 3:Update Program.cs
+using DatabaseFirst.Models;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+//------------------------------------------------------>
+//add code below
+builder.Services.AddDbContext<DemoContext>(options =>
+{
+    options.UseSqlServer(connection);
+});
+
+//------------------------------------------------------>
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+
+3. Add a controller with views and using entityframework
